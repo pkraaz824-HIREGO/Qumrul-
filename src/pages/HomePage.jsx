@@ -80,17 +80,16 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* CTA Section - Reduced spacing */}
-      <section className="bg-gray-900 text-white py-10 md:py-12 my-8 md:my-12">
-        <div className="max-w-4xl mx-auto text-center px-4">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 md:mb-4">Ready to Shop?</h2>
-          <p className="text-gray-300 text-base md:text-lg mb-6 md:mb-8">Enjoy premium quality with our exclusive collection</p>
-          <a
-            href="/products"
-            className="inline-block px-6 md:px-8 py-3 md:py-4 bg-gold-500 text-white rounded-lg hover:bg-gold-600 transition font-semibold text-sm md:text-base"
-          >
-            Start Shopping Now
-          </a>
+     {/* Trust Message Section - 3D Box */}
+      <section className="max-w-5xl mx-auto px-4 py-12 md:py-16">
+        <div className="bg-gradient-to-br from-white via-gold-50 to-white rounded-3xl p-8 md:p-12 shadow-2xl border-2 border-gold-200 transform hover:scale-105 transition-all duration-300 relative">
+          {/* 3D Effect Layers */}
+          <div className="absolute inset-0 bg-gradient-to-br from-gold-100 to-transparent rounded-3xl transform translate-x-2 translate-y-2 -z-10"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-transparent rounded-3xl transform translate-x-4 translate-y-4 -z-20"></div>
+          
+          <p className="text-lg md:text-xl text-gray-800 leading-relaxed text-center font-medium">
+            "Every refurbished laptop we sell is checked like we're buying it for our own family – carefully tested, honestly described, and backed by real support after sale. No hidden problems, no fake promises… just a reliable laptop you can trust, at a price that feels right."
+          </p>
         </div>
       </section>
     </div>
