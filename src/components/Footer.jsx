@@ -9,9 +9,9 @@ export function Footer() {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <div className="w-8 h-8 bg-gradient-to-br from-gold-500 to-gold-600 rounded-lg flex items-center justify-center text-white font-bold">
-                E
+                B
               </div>
-              <span className="text-xl font-bold">Elite Store</span>
+              <span className="text-xl font-bold">Badshah Computer</span>
             </div>
             <p className="text-gray-400 text-sm">Premium products for modern living.</p>
           </div>
@@ -52,7 +52,7 @@ export function Footer() {
 
         {/* Bottom */}
         <div className="border-t border-gray-800 pt-8 text-center text-gray-400 text-sm">
-          <p>&copy; 2024 Elite Store. All rights reserved. | Designed with elegance and minimal aesthetics</p>
+          <p>&copy; 2025-26 Badshah Computer All rights reserved.</p>
         </div>
       </div>
     </footer>

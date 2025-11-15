@@ -12,14 +12,13 @@ export function Header({ onMenuClick, isMenuOpen }) {
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <div className="flex items-center">
-            <a href="/" className="flex items-center gap-3 group">
-              <div className="w-10 h-10 bg-gradient-to-br from-gold-500 to-gold-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg group-hover:shadow-xl transition-all animate-glow">
-                E
-              </div>
-              <div>
-                <span className="text-2xl font-bold gradient-text hidden sm:inline">Elite Store</span>
-                <p className="text-xs text-gray-500 hidden sm:block">Premium Collection</p>
-              </div>
+            <a href="/" className="flex items-center group">
+              <img 
+                src={localStorage.getItem('siteLogo') || 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=200&h=80&fit=crop'}
+                alt="LAP Ultra"
+                className="h-12 object-contain group-hover:scale-105 transition-transform"
+                style={{ width: 'auto', maxWidth: '200px' }}
+              />
             </a>
           </div>
 

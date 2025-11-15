@@ -19,6 +19,11 @@ export function AdminPage() {
   const [showBannerForm, setShowBannerForm] = useState(false);
   const [editingBannerId, setEditingBannerId] = useState(null);
   
+  // Logo Settings States
+  const [logoUrl, setLogoUrl] = useState(localStorage.getItem('siteLogo') || 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=200&h=80&fit=crop');
+  const [logoHeight, setLogoHeight] = useState(localStorage.getItem('logoHeight') || '48');
+  const [logoMaxWidth, setLogoMaxWidth] = useState(localStorage.getItem('logoMaxWidth') || '200');
+  
   // Analytics Modal States
   const [showRevenueModal, setShowRevenueModal] = useState(false);
   const [showOrdersModal, setShowOrdersModal] = useState(false);
@@ -390,6 +395,16 @@ export function AdminPage() {
               }`}
             >
               Banners
+            </button>
+            <button
+              onClick={() => setActiveTab('logo')}
+              className={`flex-1 px-6 py-4 font-semibold transition ${
+                activeTab === 'logo'
+                  ? 'bg-gold-50 text-gold-600 border-b-2 border-gold-500'
+                  : 'text-gray-700 hover:text-gold-600'
+              }`}
+            >
+              Logo
             </button>
             <button
               onClick={() => setActiveTab('products')}
