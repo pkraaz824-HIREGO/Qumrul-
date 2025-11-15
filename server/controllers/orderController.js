@@ -1,7 +1,7 @@
 import Order from '../models/Order.js';
 import Product from '../models/Product.js';
 import { generateInvoicePDFBuffer } from '../services/invoiceService.js';
-import { sendInvoiceEmail } from '../services/emailService.js';
+import { sendInvoiceEmail, sendOrderConfirmationEmail } from '../services/emailService.js';
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -57,14 +57,30 @@ export const createOrder = async (req, res) => {
     // Populate user for invoice generation
     await order.populate('user', 'firstName lastName email phone');
 
-    // Generate and send invoice email (non-blocking)
+    // Generate and send invoice email + order confirmation (non-blocking)
     setImmediate(async () => {
       try {
+        // Send order confirmation email
+        await sendOrderConfirmationEmail(req.user.email, {
+          orderId: order._id,
+          firstName: req.user.firstName,
+          items: items.map(item => ({
+            name: item.name,
+            quantity: item.quantity,
+            price: item.price
+          })),
+          total,
+          shippingAddress,
+          paymentMethod
+        });
+        console.log(`✅ Order confirmation email sent for order ${order._id}`);
+
+        // Send invoice email with PDF
         const pdfBuffer = await generateInvoicePDFBuffer(order);
         await sendInvoiceEmail(req.user.email, pdfBuffer, order._id);
         console.log(`✅ Invoice email sent for order ${order._id}`);
       } catch (emailError) {
-        console.error(`❌ Failed to send invoice email for order ${order._id}:`, emailError.message);
+        console.error(`❌ Failed to send emails for order ${order._id}:`, emailError.message);
         // Don't fail the order creation if email fails
       }
     });

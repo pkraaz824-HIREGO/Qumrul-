@@ -191,13 +191,7 @@ export function LoginPage() {
             </p>
           </div>
 
-          <div className="mt-8 pt-8 border-t border-gold-200">
-            <h3 className="text-sm font-semibold text-gray-800 mb-4">Demo Accounts:</h3>
-            <div className="space-y-2 text-xs text-gray-600">
-              <p><strong>User:</strong> john@example.com / password123</p>
-              <p><strong>Admin:</strong> admin@example.com / admin123</p>
-            </div>
-          </div>
+
         </div>
       </div>
 

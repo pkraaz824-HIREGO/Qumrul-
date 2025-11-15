@@ -1,6 +1,6 @@
 import User from '../models/User.js';
 import { generateToken } from '../middleware/auth.js';
-import { sendPasswordResetEmail } from '../services/emailService.js';
+import { sendPasswordResetEmail, sendWelcomeEmail } from '../services/emailService.js';
 import crypto from 'crypto';
 
 // @desc    Register new user
@@ -25,6 +25,17 @@ export const register = async (req, res) => {
     });
 
     if (user) {
+      // Send welcome email (non-blocking)
+      setImmediate(async () => {
+        try {
+          await sendWelcomeEmail(email, firstName);
+          console.log(`✅ Welcome email sent to ${email}`);
+        } catch (emailError) {
+          console.error(`❌ Failed to send welcome email to ${email}:`, emailError.message);
+          // Don't fail registration if email fails
+        }
+      });
+
       res.status(201).json({
         _id: user._id,
         firstName: user.firstName,

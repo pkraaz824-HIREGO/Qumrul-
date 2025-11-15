@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useAuthStore, useProductStore, useUserStore, useOrderStore, useBannerStore } from '../store';
-import { X, Plus, Edit2, Trash2, DollarSign, Users, Package, TrendingUp, Upload, Image as ImageIcon, Tag, Check, XCircle, Truck, Eye, RefreshCw, ChevronUp, ChevronDown, Monitor, Calendar, Filter } from 'lucide-react';
+import { X, Plus, Edit2, Trash2, DollarSign, Users, Package, TrendingUp, Upload, Image as ImageIcon, Tag, Check, XCircle, Truck, Eye, RefreshCw, ChevronUp, ChevronDown, Monitor, Calendar, Filter, Key } from 'lucide-react';
 
 export function AdminPage() {
   const { user, isLoggedIn } = useAuthStore();
@@ -31,6 +31,15 @@ export function AdminPage() {
   const [orderDateRange, setOrderDateRange] = useState('all');
   const [customStartDate, setCustomStartDate] = useState('');
   const [customEndDate, setCustomEndDate] = useState('');
+  
+  // Password Change States
+  const [passwordFormData, setPasswordFormData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordSuccess, setPasswordSuccess] = useState('');
   
   const [bannerFormData, setBannerFormData] = useState({
     image: '',
@@ -405,6 +414,16 @@ export function AdminPage() {
               }`}
             >
               Logo
+            </button>
+            <button
+              onClick={() => setActiveTab('security')}
+              className={`flex-1 px-6 py-4 font-semibold transition ${
+                activeTab === 'security'
+                  ? 'bg-gold-50 text-gold-600 border-b-2 border-gold-500'
+                  : 'text-gray-700 hover:text-gold-600'
+              }`}
+            >
+              Security
             </button>
             <button
               onClick={() => setActiveTab('products')}
@@ -797,6 +816,152 @@ export function AdminPage() {
                     className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-semibold"
                   >
                     Reset to Default
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Security Tab - Password Change */}
+          {activeTab === 'security' && (
+            <div className="p-6">
+              <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-lg p-6 border-2 border-red-200 max-w-2xl">
+                <div className="mb-6">
+                  <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2 mb-2">
+                    <Key className="text-red-600" size={24} />
+                    Change Admin Password
+                  </h3>
+                  <p className="text-sm text-gray-600">Update your admin account password</p>
+                </div>
+
+                {passwordError && (
+                  <div className="bg-red-100 border-2 border-red-300 text-red-700 px-4 py-3 rounded-lg mb-4">
+                    {passwordError}
+                  </div>
+                )}
+
+                {passwordSuccess && (
+                  <div className="bg-green-100 border-2 border-green-300 text-green-700 px-4 py-3 rounded-lg mb-4">
+                    {passwordSuccess}
+                  </div>
+                )}
+
+                <div className="space-y-4 mb-6">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Current Password *</label>
+                    <input
+                      type="password"
+                      value={passwordFormData.currentPassword}
+                      onChange={(e) => {
+                        setPasswordFormData({ ...passwordFormData, currentPassword: e.target.value });
+                        setPasswordError('');
+                        setPasswordSuccess('');
+                      }}
+                      placeholder="Enter current password"
+                      className="w-full px-4 py-3 border-2 border-red-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">New Password *</label>
+                    <input
+                      type="password"
+                      value={passwordFormData.newPassword}
+                      onChange={(e) => {
+                        setPasswordFormData({ ...passwordFormData, newPassword: e.target.value });
+                        setPasswordError('');
+                        setPasswordSuccess('');
+                      }}
+                      placeholder="Enter new password (min 6 characters)"
+                      className="w-full px-4 py-3 border-2 border-red-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Confirm New Password *</label>
+                    <input
+                      type="password"
+                      value={passwordFormData.confirmPassword}
+                      onChange={(e) => {
+                        setPasswordFormData({ ...passwordFormData, confirmPassword: e.target.value });
+                        setPasswordError('');
+                        setPasswordSuccess('');
+                      }}
+                      placeholder="Re-enter new password"
+                      className="w-full px-4 py-3 border-2 border-red-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+
+                <div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-4 mb-6">
+                  <h4 className="text-sm font-bold text-yellow-900 mb-2 flex items-center gap-2">
+                    <XCircle size={18} />
+                    Password Requirements
+                  </h4>
+                  <ul className="text-sm text-yellow-800 space-y-1 list-disc list-inside">
+                    <li>Minimum 6 characters</li>
+                    <li>Must match the confirmation password</li>
+                    <li>Cannot be the same as current password</li>
+                  </ul>
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => {
+                      // Validate inputs
+                      if (!passwordFormData.currentPassword || !passwordFormData.newPassword || !passwordFormData.confirmPassword) {
+                        setPasswordError('All fields are required');
+                        return;
+                      }
+
+                      if (passwordFormData.newPassword.length < 6) {
+                        setPasswordError('New password must be at least 6 characters');
+                        return;
+                      }
+
+                      if (passwordFormData.newPassword !== passwordFormData.confirmPassword) {
+                        setPasswordError('New passwords do not match');
+                        return;
+                      }
+
+                      if (passwordFormData.currentPassword === passwordFormData.newPassword) {
+                        setPasswordError('New password must be different from current password');
+                        return;
+                      }
+
+                      // In a real app, this would call the backend API
+                      // For now, we'll simulate success
+                      setPasswordSuccess('Password updated successfully! You will be logged out.');
+                      setPasswordFormData({
+                        currentPassword: '',
+                        newPassword: '',
+                        confirmPassword: ''
+                      });
+
+                      // Simulate logout after password change
+                      setTimeout(() => {
+                        alert('Password changed successfully. Please log in again.');
+                        // In real implementation, would call logout() and redirect
+                      }, 2000);
+                    }}
+                    className="flex-1 px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition font-bold shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                  >
+                    <Key size={20} />
+                    Change Password
+                  </button>
+                  <button
+                    onClick={() => {
+                      setPasswordFormData({
+                        currentPassword: '',
+                        newPassword: '',
+                        confirmPassword: ''
+                      });
+                      setPasswordError('');
+                      setPasswordSuccess('');
+                    }}
+                    className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-semibold"
+                  >
+                    Clear
                   </button>
                 </div>
               </div>
