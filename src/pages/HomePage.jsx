@@ -80,16 +80,40 @@ export function HomePage() {
         </div>
       </section>
 
-     {/* Trust Message Section - 3D Box */}
+     {/* Trust Message Section - Premium 3D Box */}
       <section className="max-w-5xl mx-auto px-4 py-12 md:py-16">
-        <div className="bg-gradient-to-br from-white via-gold-50 to-white rounded-3xl p-8 md:p-12 shadow-2xl border-2 border-gold-200 transform hover:scale-105 transition-all duration-300 relative">
-          {/* 3D Effect Layers */}
-          <div className="absolute inset-0 bg-gradient-to-br from-gold-100 to-transparent rounded-3xl transform translate-x-2 translate-y-2 -z-10"></div>
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-transparent rounded-3xl transform translate-x-4 translate-y-4 -z-20"></div>
+        <div className="relative">
+          {/* 3D Shadow Layers */}
+          <div className="absolute inset-0 bg-gradient-to-br from-gold-200 to-gold-100 rounded-3xl transform translate-x-3 translate-y-3 blur-sm opacity-60"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-gold-300 to-gold-200 rounded-3xl transform translate-x-6 translate-y-6 blur-md opacity-40"></div>
           
-          <p className="text-lg md:text-xl text-gray-800 leading-relaxed text-center font-medium">
-            "Every refurbished laptop we sell is checked like we're buying it for our own family – carefully tested, honestly described, and backed by real support after sale. No hidden problems, no fake promises… just a reliable laptop you can trust, at a price that feels right."
-          </p>
+          {/* Main Card */}
+          <div className="relative bg-gradient-to-br from-white via-gold-50/30 to-white rounded-3xl p-8 md:p-12 shadow-2xl border-4 border-gold-300 hover:border-gold-400 transform hover:-translate-y-2 transition-all duration-500">
+            {/* Decorative Corner Accents */}
+            <div className="absolute top-0 left-0 w-16 h-16 border-t-4 border-l-4 border-gold-500 rounded-tl-3xl"></div>
+            <div className="absolute top-0 right-0 w-16 h-16 border-t-4 border-r-4 border-gold-500 rounded-tr-3xl"></div>
+            <div className="absolute bottom-0 left-0 w-16 h-16 border-b-4 border-l-4 border-gold-500 rounded-bl-3xl"></div>
+            <div className="absolute bottom-0 right-0 w-16 h-16 border-b-4 border-r-4 border-gold-500 rounded-br-3xl"></div>
+            
+            {/* Quote Icon */}
+            <div className="flex justify-center mb-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-gold-500 to-gold-600 rounded-full flex items-center justify-center shadow-lg">
+                <span className="text-white text-3xl font-serif">"</span>
+              </div>
+            </div>
+            
+            {/* Message Text */}
+            <p className="text-lg md:text-xl text-gray-800 leading-relaxed text-center font-medium mb-6">
+              Every refurbished laptop we sell is checked like we're buying it for our own family – carefully tested, honestly described, and backed by real support after sale. No hidden problems, no fake promises… just a reliable laptop you can trust, at a price that feels right.
+            </p>
+            
+            {/* Signature Line */}
+            <div className="flex justify-center">
+              <div className="border-t-2 border-gold-500 pt-3">
+                <p className="text-gold-700 font-bold text-base">— Our Commitment to You</p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
     </div>
