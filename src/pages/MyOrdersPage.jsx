@@ -23,8 +23,9 @@ export function MyOrdersPage() {
         return;
       }
 
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
       // Call backend API to get PDF
-      const response = await fetch(`http://localhost:5000/api/orders/${order.id}/invoice`, {
+      const response = await fetch(`${API_URL}/api/orders/${order.id}/invoice`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${userObj.token || ''}`,

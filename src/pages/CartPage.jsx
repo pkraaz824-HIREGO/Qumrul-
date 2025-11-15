@@ -40,7 +40,8 @@ export function CartPage() {
         return;
       }
 
-      const response = await fetch(`http://localhost:5000/api/orders/${orderId}/invoice`, {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const response = await fetch(`${API_URL}/api/orders/${orderId}/invoice`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${userObj.token || ''}`,

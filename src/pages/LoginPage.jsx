@@ -34,7 +34,8 @@ export function LoginPage() {
     }
     
     try {
-      const response = await fetch('http://localhost:5000/api/auth/forgot-password', {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const response = await fetch(`${API_URL}/api/auth/forgot-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -51,7 +52,7 @@ export function LoginPage() {
         setError(data.message || 'Failed to send reset email');
       }
     } catch (err) {
-      setError('Network error. Please check if the server is running.');
+      setError('Unable to connect to server. Please try again later.');
     }
   };
 
