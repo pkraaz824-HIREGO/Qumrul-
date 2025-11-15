@@ -49,9 +49,8 @@ export function CartPage() {
   const subtotal = isBuyNow 
     ? buyNowItems.reduce((total, item) => total + item.price * item.quantity, 0)
     : getTotal();
-  const tax = parseFloat((subtotal * 0.08).toFixed(2));
   const shipping = subtotal > 1000 ? 0 : 100;
-  const total = parseFloat((subtotal + tax + shipping).toFixed(2));
+  const total = parseFloat((subtotal + shipping).toFixed(2));
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -94,7 +93,7 @@ export function CartPage() {
         image: item.image
       })),
       subtotal,
-      tax,
+      tax: 0,
       shipping,
       total,
       status: 'pending',
@@ -299,10 +298,6 @@ export function CartPage() {
                     <span>₹{subtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-sm text-gray-600">
-                    <span>Tax (8%)</span>
-                    <span>₹{tax.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between text-sm text-gray-600">
                     <span>Shipping</span>
                     <span>{shipping === 0 ? 'FREE' : `₹${shipping.toFixed(2)}`}</span>
                   </div>
@@ -361,10 +356,6 @@ export function CartPage() {
                   <div className="flex justify-between text-gray-600">
                     <span>Subtotal</span>
                     <span>₹{subtotal.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between text-gray-600">
-                    <span>Tax (8%)</span>
-                    <span>₹{tax.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-gray-600">
                     <span>Shipping</span>
