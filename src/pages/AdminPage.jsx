@@ -659,14 +659,35 @@ export function AdminPage() {
                 {/* Logo URL */}
                 <div className="mb-6">
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Logo Image URL *</label>
-                  <input
-                    type="text"
-                    value={logoUrl}
-                    onChange={(e) => setLogoUrl(e.target.value)}
-                    placeholder="https://example.com/logo.png"
-                    className="w-full px-4 py-3 border-2 border-gold-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold-500 focus:border-transparent"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">Enter the direct URL to your logo image</p>
+                  <div className="flex gap-3">
+                    <input
+                      type="text"
+                      value={logoUrl}
+                      onChange={(e) => setLogoUrl(e.target.value)}
+                      placeholder="https://example.com/logo.png"
+                      className="flex-1 px-4 py-3 border-2 border-gold-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold-500 focus:border-transparent"
+                    />
+                    <label className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition font-semibold cursor-pointer flex items-center gap-2">
+                      <Upload size={20} />
+                      Upload Logo
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onloadend = () => {
+                              setLogoUrl(reader.result);
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">Enter a URL or upload an image file</p>
                 </div>
 
                 {/* Logo Dimensions */}
