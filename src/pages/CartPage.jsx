@@ -98,9 +98,9 @@ export function CartPage() {
       shipping,
       total,
       status: 'pending',
-      paymentMethod: formData.paymentType === 'cod' ? 'Cash on Delivery' : 'Credit Card',
-      paymentType: formData.paymentType,
-      isPaid: formData.paymentType === 'prepaid',
+      paymentMethod: 'Cash on Delivery',
+      paymentType: 'cod',
+      isPaid: false,
       createdAt: new Date().toISOString().split('T')[0],
       estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       shippingAddress: `${formData.address}, ${formData.city}, ${formData.state} ${formData.zipCode}`,
@@ -244,87 +244,39 @@ export function CartPage() {
               <div className="bg-white rounded-lg shadow-md p-6 border border-gold-100">
                 <h2 className="text-xl font-bold text-gray-800 mb-6">Payment Information</h2>
                 
-                {/* Payment Type Selection */}
+                {/* Payment Type - COD Only */}
                 <div className="mb-6">
                   <label className="block text-sm font-semibold text-gray-800 mb-3">Payment Method</label>
-                  <div className="grid grid-cols-2 gap-4">
-                    <button
-                      type="button"
-                      onClick={() => setFormData(prev => ({ ...prev, paymentType: 'prepaid' }))}
-                      className={`p-4 border-2 rounded-lg transition ${
-                        formData.paymentType === 'prepaid'
-                          ? 'border-gold-500 bg-gold-50'
-                          : 'border-gray-200 hover:border-gold-300'
-                      }`}
-                    >
-                      <div className="text-left">
-                        <p className="font-bold text-gray-900">Credit/Debit Card</p>
-                        <p className="text-xs text-gray-600 mt-1">Pay now securely</p>
+                  <div className="p-4 border-2 border-gold-500 bg-gold-50 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 bg-gradient-to-br from-gold-500 to-gold-600 rounded-lg flex items-center justify-center">
+                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
                       </div>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setFormData(prev => ({ ...prev, paymentType: 'cod' }))}
-                      className={`p-4 border-2 rounded-lg transition ${
-                        formData.paymentType === 'cod'
-                          ? 'border-gold-500 bg-gold-50'
-                          : 'border-gray-200 hover:border-gold-300'
-                      }`}
-                    >
-                      <div className="text-left">
-                        <p className="font-bold text-gray-900">Cash on Delivery</p>
-                        <p className="text-xs text-gray-600 mt-1">Pay when delivered</p>
+                      <div>
+                        <p className="font-bold text-gray-900 text-lg">Cash on Delivery (COD)</p>
+                        <p className="text-sm text-gray-600 mt-1">Pay with cash when your order is delivered</p>
                       </div>
-                    </button>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div className="flex gap-3">
+                      <svg className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                      </svg>
+                      <div>
+                        <p className="text-sm font-semibold text-blue-900">Important Information:</p>
+                        <ul className="text-sm text-blue-800 mt-2 space-y-1">
+                          <li>• Please keep exact change ready for smooth delivery</li>
+                          <li>• Payment accepted in cash only upon delivery</li>
+                          <li>• You can cancel your order anytime before delivery with no charges</li>
+                        </ul>
+                      </div>
+                    </div>
                   </div>
                 </div>
-
-                {/* Card Details (only for prepaid) */}
-                {formData.paymentType === 'prepaid' && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <input
-                      type="text"
-                      name="cardName"
-                      placeholder="Cardholder Name"
-                      value={formData.cardName}
-                      onChange={handleInputChange}
-                      className="sm:col-span-2 px-4 py-3 border border-gold-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold-500"
-                    />
-                    <input
-                      type="text"
-                      name="cardNumber"
-                      placeholder="Card Number"
-                      value={formData.cardNumber}
-                      onChange={handleInputChange}
-                      className="sm:col-span-2 px-4 py-3 border border-gold-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold-500"
-                    />
-                    <input
-                      type="text"
-                      name="cardExpiry"
-                      placeholder="MM/YY"
-                      value={formData.cardExpiry}
-                      onChange={handleInputChange}
-                      className="px-4 py-3 border border-gold-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold-500"
-                    />
-                    <input
-                      type="text"
-                      name="cardCvv"
-                      placeholder="CVV"
-                      value={formData.cardCvv}
-                      onChange={handleInputChange}
-                      className="px-4 py-3 border border-gold-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold-500"
-                    />
-                  </div>
-                )}
-
-                {/* COD Note */}
-                {formData.paymentType === 'cod' && (
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                    <p className="text-sm text-yellow-800">
-                      <strong>Note:</strong> You can cancel COD orders anytime before delivery with no charges.
-                    </p>
-                  </div>
-                )}
               </div>
             </div>
 

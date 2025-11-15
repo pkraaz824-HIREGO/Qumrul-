@@ -8,7 +8,8 @@ export function LoginPage() {
     email: '',
     password: '',
     firstName: '',
-    lastName: ''
+    lastName: '',
+    phone: ''
   });
   const [error, setError] = useState('');
 
@@ -25,11 +26,17 @@ export function LoginPage() {
     e.preventDefault();
     
     if (isRegister) {
-      if (!formData.email || !formData.password || !formData.firstName || !formData.lastName) {
+      if (!formData.email || !formData.password || !formData.firstName || !formData.lastName || !formData.phone) {
         setError('All fields are required');
         return;
       }
-      const success = register(formData.email, formData.firstName, formData.lastName, formData.password);
+      
+      // Validate phone number (10 digits)
+      if (!/^\d{10}$/.test(formData.phone)) {
+        setError('Please enter a valid 10-digit mobile number');
+        return;
+      }
+      const success = register(formData.email, formData.firstName, formData.lastName, formData.password, formData.phone);
       if (success) {
         window.location.href = '/';
       } else {
@@ -85,6 +92,16 @@ export function LoginPage() {
                   onChange={handleInputChange}
                   className="w-full px-4 py-3 border border-gold-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold-500"
                 />
+                <input
+                  type="tel"
+                  name="phone"
+                  placeholder="Mobile Number (10 digits)"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  maxLength="10"
+                  pattern="[0-9]{10}"
+                  className="w-full px-4 py-3 border border-gold-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold-500"
+                />
               </>
             )}
 
@@ -120,7 +137,7 @@ export function LoginPage() {
               <button
                 onClick={() => {
                   setIsRegister(!isRegister);
-                  setFormData({ email: '', password: '', firstName: '', lastName: '' });
+                  setFormData({ email: '', password: '', firstName: '', lastName: '', phone: '' });
                   setError('');
                 }}
                 className="text-gold-600 hover:text-gold-700 font-semibold"

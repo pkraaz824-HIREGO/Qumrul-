@@ -67,7 +67,7 @@ export const useAuthStore = create((set) => ({
     }
     return false;
   },
-  register: (email, firstName, lastName, password) => {
+  register: (email, firstName, lastName, password, phone) => {
     if (mockUsers.find(u => u.email === email)) {
       return false;
     }
@@ -77,7 +77,7 @@ export const useAuthStore = create((set) => ({
       password,
       firstName,
       lastName,
-      phone: '',
+      phone: phone || '',
       address: '',
       city: '',
       state: '',
