@@ -85,7 +85,7 @@ export async function sendInvoiceEmail(email, pdfBuffer, orderNumber) {
     const mailOptions = {
       from: process.env.SMTP_FROM,
       to: email,
-      subject: `Your Elite Store Invoice - Order #${orderNumber}`,
+      subject: `Your LAP Ultra Invoice - Order #${orderNumber}`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -105,7 +105,7 @@ export async function sendInvoiceEmail(email, pdfBuffer, orderNumber) {
             </div>
             <div class="content">
               <p>Dear Customer,</p>
-              <p>Thank you for shopping at Elite Store!</p>
+              <p>Thank you for shopping at LAP Ultra!</p>
               <p>Please find your invoice attached to this email for order <strong>#${orderNumber}</strong>.</p>
               <p>Your order is being processed and will be shipped shortly.</p>
               <p style="margin-top: 30px;">
@@ -114,7 +114,7 @@ export async function sendInvoiceEmail(email, pdfBuffer, orderNumber) {
               </p>
             </div>
             <div class="footer">
-              <p>© ${new Date().getFullYear()} Elite Store. All rights reserved.</p>
+              <p>© ${new Date().getFullYear()} LAP Ultra. All rights reserved.</p>
             </div>
           </div>
         </body>
@@ -134,6 +134,63 @@ export async function sendInvoiceEmail(email, pdfBuffer, orderNumber) {
     return info;
   } catch (error) {
     console.error('❌ Error sending invoice email:', error);
+    throw error;
+  }
+}
+
+// Send OTP email for profile updates
+export async function sendOTPEmail(email, otp, purpose) {
+  try {
+    const mailOptions = {
+      from: process.env.SMTP_FROM,
+      to: email,
+      subject: `Your LAP Ultra Verification Code - ${purpose}`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #d4af37 0%, #f2d06b 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+            .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+            .otp-box { background: white; border: 2px dashed #d4af37; padding: 20px; text-align: center; margin: 20px 0; border-radius: 8px; }
+            .otp-code { font-size: 32px; font-weight: bold; color: #d4af37; letter-spacing: 5px; }
+            .warning { background: #fff3cd; border-left: 4px solid #ffc107; padding: 12px; margin: 20px 0; border-radius: 4px; }
+            .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>🔐 Verification Required</h1>
+            </div>
+            <div class="content">
+              <h2>Verification Code for ${purpose}</h2>
+              <p>You have requested to update your profile information. Please use the verification code below:</p>
+              <div class="otp-box">
+                <div class="otp-code">${otp}</div>
+              </div>
+              <p>This code will expire in <strong>10 minutes</strong>.</p>
+              <div class="warning">
+                <strong>⚠️ Security Notice:</strong> If you did not request this code, please ignore this email and ensure your account is secure.
+              </div>
+              <p style="margin-top: 30px;">Best regards,<br><strong>LAP Ultra Team</strong></p>
+            </div>
+            <div class="footer">
+              <p>© ${new Date().getFullYear()} LAP Ultra. All rights reserved.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log('✅ OTP email sent:', info.messageId);
+    return info;
+  } catch (error) {
+    console.error('❌ Error sending OTP email:', error);
     throw error;
   }
 }

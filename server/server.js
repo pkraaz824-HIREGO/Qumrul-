@@ -12,6 +12,7 @@ import authRoutes from './routes/authRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import bannerRoutes from './routes/bannerRoutes.js';
+import profileRoutes from './routes/profileRoutes.js';
 
 // Load environment variables
 dotenv.config();
@@ -74,12 +75,13 @@ app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/banners', bannerRoutes);
+app.use('/api/profile', profileRoutes);
 
 // Health check route
 app.get('/api/health', (req, res) => {
   res.json({ 
     status: 'OK', 
-    message: 'Elite Store API is running',
+    message: 'LAP Ultra API is running',
     timestamp: new Date().toISOString()
   });
 });
@@ -87,13 +89,14 @@ app.get('/api/health', (req, res) => {
 // Root route
 app.get('/', (req, res) => {
   res.json({ 
-    message: 'Welcome to Elite Store API',
+    message: 'Welcome to LAP Ultra API',
     version: '1.0.0',
     endpoints: {
       auth: '/api/auth',
       products: '/api/products',
       orders: '/api/orders',
       banners: '/api/banners',
+      profile: '/api/profile',
       health: '/api/health'
     }
   });

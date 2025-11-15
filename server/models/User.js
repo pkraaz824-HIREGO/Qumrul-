@@ -38,15 +38,20 @@ const userSchema = new mongoose.Schema({
     default: ''
   },
   addresses: [{
+    label: { type: String, default: 'Home' },
     street: String,
     city: String,
     state: String,
     zipCode: String,
-    country: String,
+    country: { type: String, default: 'India' },
     isDefault: { type: Boolean, default: false }
   }],
   resetPasswordToken: String,
   resetPasswordExpires: Date,
+  otpToken: String,
+  otpExpires: Date,
+  pendingEmailUpdate: String,
+  pendingPhoneUpdate: String,
   createdAt: {
     type: Date,
     default: Date.now
@@ -85,6 +90,22 @@ userSchema.methods.createPasswordResetToken = function() {
   this.resetPasswordExpires = Date.now() + 60 * 60 * 1000;
   
   return resetToken;
+};
+
+// Generate OTP for email/phone verification
+userSchema.methods.createOTP = function() {
+  const otp = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
+  
+  // Hash OTP and set to otpToken field
+  this.otpToken = crypto
+    .createHash('sha256')
+    .update(otp)
+    .digest('hex');
+  
+  // Set OTP expiry to 10 minutes
+  this.otpExpires = Date.now() + 10 * 60 * 1000;
+  
+  return otp;
 };
 
 const User = mongoose.model('User', userSchema);

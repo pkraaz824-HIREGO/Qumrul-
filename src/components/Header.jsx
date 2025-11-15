@@ -65,7 +65,7 @@ export function Header({ onMenuClick, isMenuOpen }) {
             {/* Auth */}
             {isLoggedIn ? (
               <div className="flex items-center gap-3">
-                <div className="hidden sm:flex items-center gap-2 bg-gold-50 px-4 py-2 rounded-full">
+                <div className="hidden sm:flex items-center gap-2 bg-gold-50 px-4 py-2 rounded-full cursor-pointer hover:bg-gold-100 transition" onClick={() => window.location.href = '/profile'}>
                   <div className="w-8 h-8 bg-gradient-to-br from-gold-500 to-gold-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
                     {user?.firstName?.charAt(0)}
                   </div>
@@ -102,7 +102,10 @@ export function Header({ onMenuClick, isMenuOpen }) {
             <a href="/" className="block px-4 py-2 text-gray-700 hover:bg-gold-50 rounded">Home</a>
             <a href="/products" className="block px-4 py-2 text-gray-700 hover:bg-gold-50 rounded">Shop</a>
             {isLoggedIn && (
-              <a href="/my-orders" className="block px-4 py-2 text-gray-700 hover:bg-gold-50 rounded">My Orders</a>
+              <>
+                <a href="/profile" className="block px-4 py-2 text-gray-700 hover:bg-gold-50 rounded">My Profile</a>
+                <a href="/my-orders" className="block px-4 py-2 text-gray-700 hover:bg-gold-50 rounded">My Orders</a>
+              </>
             )}
             {isLoggedIn && user?.isAdmin && (
               <a href="/admin" className="block px-4 py-2 text-gray-700 hover:bg-gold-50 rounded">Admin</a>
