@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShoppingCart, Menu, X, LogOut, LogIn, BarChart3 } from 'lucide-react';
+import { ShoppingCart, Menu, X, LogOut, LogIn, BarChart3, Mail, Phone } from 'lucide-react';
 import { useAuthStore, useCartStore } from '../store';
 
 export function Header({ onMenuClick, isMenuOpen }) {
@@ -7,7 +7,28 @@ export function Header({ onMenuClick, isMenuOpen }) {
   const cartItems = useCartStore(state => state.items);
 
   return (
-    <header className="bg-white/80 backdrop-blur-lg border-b border-gold-200/50 sticky top-0 z-50 shadow-lg">
+    <>
+      {/* Top Contact Bar */}
+      <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white py-2 px-4">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4">
+          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-6 text-xs sm:text-sm">
+            <a href="mailto:quamrulislam909@gmail.com" className="flex items-center gap-2 hover:text-gold-400 transition group">
+              <Mail size={16} className="text-gold-500 group-hover:scale-110 transition" />
+              <span className="font-medium">quamrulislam909@gmail.com</span>
+            </a>
+            <a href="tel:+917765888430" className="flex items-center gap-2 hover:text-gold-400 transition group">
+              <Phone size={16} className="text-gold-500 group-hover:scale-110 transition" />
+              <span className="font-medium">+91 77658 88430</span>
+            </a>
+          </div>
+          <div className="text-xs sm:text-sm text-gray-300">
+            <span className="hidden sm:inline">Need Help? </span>Contact Support Anytime
+          </div>
+        </div>
+      </div>
+
+      {/* Main Header */}
+      <header className="bg-white/80 backdrop-blur-lg border-b border-gold-200/50 sticky top-0 z-50 shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
@@ -113,5 +134,6 @@ export function Header({ onMenuClick, isMenuOpen }) {
         )}
       </div>
     </header>
+    </>
   );
 }

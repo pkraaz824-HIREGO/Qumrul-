@@ -121,10 +121,10 @@ export function ProductsPage() {
             </div>
           </div>
 
-          {/* Products Grid - Premium 3 columns with optimized spacing */}
+          {/* Products Grid - Premium layout with proper spacing */}
           <div className="lg:col-span-3">
             {filteredProducts.length > 0 ? (
-              <div className="grid grid-cols-3 gap-3 md:gap-4 lg:gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                 {filteredProducts.map(product => (
                   <ProductCard
                     key={product.id}
