@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useAuthStore, useOrderStore } from '../store';
 import { Package, Truck, CheckCircle, XCircle, Clock, MapPin, Phone, CreditCard, Calendar, AlertCircle, Download, Mail } from 'lucide-react';
-import { downloadInvoice, sendInvoiceEmail } from '../utils/invoiceGenerator';
 
 export function MyOrdersPage() {
   const { user, isLoggedIn } = useAuthStore();
@@ -11,16 +10,57 @@ export function MyOrdersPage() {
   const [cancelReason, setCancelReason] = useState('');
   const [orderToCancel, setOrderToCancel] = useState(null);
   const [emailSending, setEmailSending] = useState(false);
+  const [downloading, setDownloading] = useState(false);
 
-  const handleDownloadInvoice = (order) => {
-    downloadInvoice(order, user);
+  const handleDownloadInvoice = async (order) => {
+    setDownloading(true);
+    try {
+      const token = localStorage.getItem('user');
+      const userObj = token ? JSON.parse(token) : null;
+      
+      if (!userObj) {
+        alert('Please login to download invoice');
+        return;
+      }
+
+      // Call backend API to get PDF
+      const response = await fetch(`http://localhost:5000/api/orders/${order.id}/invoice`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${userObj.token || ''}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to download invoice');
+      }
+
+      // Get the PDF blob
+      const blob = await response.blob();
+      
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Invoice-${order.id}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      alert('Invoice downloaded successfully!');
+    } catch (error) {
+      console.error('Download error:', error);
+      alert('Failed to download invoice. Please try again.');
+    } finally {
+      setDownloading(false);
+    }
   };
 
   const handleEmailInvoice = async (order) => {
     setEmailSending(true);
     try {
-      const result = await sendInvoiceEmail(order, user);
-      alert(result.message + '\n(In production, this would send an actual email)');
+      alert('Invoice email feature will be available once SMTP is configured on the server.');
     } catch (error) {
       alert('Failed to send invoice email');
     } finally {
@@ -180,10 +220,11 @@ export function MyOrdersPage() {
                   
                   <button
                     onClick={() => handleDownloadInvoice(order)}
-                    className="px-6 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 hover:shadow-xl transition font-semibold flex items-center gap-2"
+                    disabled={downloading}
+                    className="px-6 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 hover:shadow-xl transition font-semibold flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Download size={18} />
-                    Download Invoice
+                    {downloading ? 'Downloading...' : 'Download Invoice'}
                   </button>
                   
                   <button

@@ -1,26 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { useAuthStore } from '../store';
 import { Lock, CheckCircle } from 'lucide-react';
 
 export function ResetPasswordPage() {
-  const { resetPassword } = useAuthStore();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [email, setEmail] = useState('');
+  const [token, setToken] = useState('');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Get email from localStorage (set during forgot password flow)
-    const resetEmail = localStorage.getItem('resetEmail');
-    if (resetEmail) {
-      setEmail(resetEmail);
+    // Get token and email from URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const tokenParam = urlParams.get('token');
+    const emailParam = urlParams.get('email');
+    
+    if (tokenParam && emailParam) {
+      setToken(tokenParam);
+      setEmail(decodeURIComponent(emailParam));
     } else {
       setError('Invalid reset link. Please request a new password reset.');
     }
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -39,20 +43,35 @@ export function ResetPasswordPage() {
       return;
     }
 
-    if (!email) {
+    if (!email || !token) {
       setError('Invalid reset link');
       return;
     }
 
-    const result = resetPassword(email, password);
-    if (result) {
-      setSuccess(true);
-      localStorage.removeItem('resetEmail');
-      setTimeout(() => {
-        window.location.href = '/login';
-      }, 3000);
-    } else {
-      setError('Failed to reset password. Please try again.');
+    setLoading(true);
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/reset-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token, email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setSuccess(true);
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 3000);
+      } else {
+        setError(data.message || 'Failed to reset password. Please try again.');
+      }
+    } catch (err) {
+      setError('Network error. Please check if the server is running.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -113,9 +132,10 @@ export function ResetPasswordPage() {
 
                 <button
                   type="submit"
-                  className="w-full px-6 py-3 bg-gold-500 text-white rounded-lg hover:bg-gold-600 transition font-semibold mt-6"
+                  disabled={loading}
+                  className="w-full px-6 py-3 bg-gold-500 text-white rounded-lg hover:bg-gold-600 transition font-semibold mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Reset Password
+                  {loading ? 'Resetting...' : 'Reset Password'}
                 </button>
               </form>
 

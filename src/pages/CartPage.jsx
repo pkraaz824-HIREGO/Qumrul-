@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { useCartStore, useOrderStore, useAuthStore } from '../store';
 import { CartItem } from '../components/CartItem';
-import { ArrowRight, Package } from 'lucide-react';
-import { downloadInvoice, sendInvoiceEmail } from '../utils/invoiceGenerator';
+import { ArrowRight, Package, Download } from 'lucide-react';
 
 export function CartPage() {
   const { items, removeItem, updateQuantity, clearCart, getTotal } = useCartStore();
@@ -28,6 +27,48 @@ export function CartPage() {
     cardCvv: ''
   });
   const [order, setOrder] = useState(null);
+  const [downloading, setDownloading] = useState(false);
+
+  const handleDownloadInvoice = async (orderId) => {
+    setDownloading(true);
+    try {
+      const token = localStorage.getItem('user');
+      const userObj = token ? JSON.parse(token) : null;
+      
+      if (!userObj) {
+        alert('Please login to download invoice');
+        return;
+      }
+
+      const response = await fetch(`http://localhost:5000/api/orders/${orderId}/invoice`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${userObj.token || ''}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to download invoice');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Invoice-${orderId}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      alert('Invoice downloaded successfully!');
+    } catch (error) {
+      console.error('Download error:', error);
+      alert('Failed to download invoice. Please try again.');
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   // Check for Buy Now flow
   React.useEffect(() => {
@@ -150,11 +191,12 @@ export function CartPage() {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
               <button
-                onClick={() => downloadInvoice(order, user)}
-                className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition font-semibold flex items-center justify-center gap-2"
+                onClick={() => handleDownloadInvoice(order.id)}
+                disabled={downloading}
+                className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <Package size={20} />
-                Download Invoice
+                <Download size={20} />
+                {downloading ? 'Downloading...' : 'Download Invoice'}
               </button>
             </div>
 

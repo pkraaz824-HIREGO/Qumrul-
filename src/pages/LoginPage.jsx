@@ -26,20 +26,33 @@ export function LoginPage() {
     setError('');
   };
 
-  const handleForgotPassword = (e) => {
+  const handleForgotPassword = async (e) => {
     e.preventDefault();
     if (!resetEmail) {
       setError('Please enter your email address');
       return;
     }
     
-    // In real app, this would call API to send reset email
-    // For demo, we'll save email and redirect to reset page
-    localStorage.setItem('resetEmail', resetEmail);
-    setResetSent(true);
-    setTimeout(() => {
-      window.location.href = '/reset-password';
-    }, 2000);
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: resetEmail }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setResetSent(true);
+        // Don't auto-redirect, let user read the message
+      } else {
+        setError(data.message || 'Failed to send reset email');
+      }
+    } catch (err) {
+      setError('Network error. Please check if the server is running.');
+    }
   };
 
   const handleSubmit = (e) => {
