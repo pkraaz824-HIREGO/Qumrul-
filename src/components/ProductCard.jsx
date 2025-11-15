@@ -26,7 +26,7 @@ export function ProductCard({ product, onAddToCart }) {
   return (
     <div 
       onClick={handleCardClick}
-      className="premium-card rounded-xl overflow-hidden group relative animate-fadeInUp shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 hover:border-gold-300 transform hover:-translate-y-1 cursor-pointer"
+      className="premium-card rounded-xl overflow-hidden group relative animate-fadeInUp shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 hover:border-gold-300 transform hover:-translate-y-1 cursor-pointer w-full max-w-sm mx-auto"
     >
       {/* Image Container - Premium with gradient overlay */}
       <div className="relative overflow-hidden bg-gradient-to-br from-gray-50 via-white to-gray-100 h-32 md:h-36 lg:h-40">
