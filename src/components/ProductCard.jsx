@@ -10,7 +10,8 @@ export function ProductCard({ product, onAddToCart }) {
     if (e.target.closest('button')) {
       return;
     }
-    window.location.href = `/product/${product.id}`;
+    window.history.pushState({}, '', `/product/${product.id}`);
+    window.dispatchEvent(new PopStateEvent('popstate'));
   };
 
   const handleBuyNow = () => {
@@ -66,7 +67,8 @@ export function ProductCard({ product, onAddToCart }) {
           <button 
             onClick={(e) => {
               e.stopPropagation();
-              window.location.href = `/product/${product.id}`;
+              window.history.pushState({}, '', `/product/${product.id}`);
+              window.dispatchEvent(new PopStateEvent('popstate'));
             }}
             className="bg-white/95 backdrop-blur-xl p-1.5 md:p-2 rounded-full shadow-2xl hover:bg-gold-500 hover:text-white transition-all duration-300 hover:scale-110 border border-white/50"
           >
