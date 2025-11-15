@@ -620,6 +620,162 @@ export function AdminPage() {
             </div>
           )}
 
+          {/* Logo Tab */}
+          {activeTab === 'logo' && (
+            <div className="p-6">
+              <div className="bg-gradient-to-br from-gold-50 to-orange-50 rounded-lg p-6 border-2 border-gold-200">
+                <div className="mb-6">
+                  <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2 mb-2">
+                    <ImageIcon className="text-gold-600" size={24} />
+                    Logo Settings
+                  </h3>
+                  <p className="text-sm text-gray-600">Customize your site logo appearance</p>
+                </div>
+
+                {/* Logo Preview */}
+                <div className="mb-6 p-4 bg-white rounded-lg border-2 border-dashed border-gold-300">
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">Logo Preview</label>
+                  <div className="flex items-center justify-center p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg">
+                    {logoUrl ? (
+                      <img
+                        src={logoUrl}
+                        alt="Site Logo"
+                        style={{ 
+                          height: `${logoHeight}px`,
+                          maxWidth: `${logoMaxWidth}px`,
+                          width: 'auto'
+                        }}
+                        className="object-contain"
+                      />
+                    ) : (
+                      <div className="text-center text-gray-400">
+                        <ImageIcon size={48} className="mx-auto mb-2" />
+                        <p className="text-sm">No logo set</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Logo URL */}
+                <div className="mb-6">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Logo Image URL *</label>
+                  <input
+                    type="text"
+                    value={logoUrl}
+                    onChange={(e) => setLogoUrl(e.target.value)}
+                    placeholder="https://example.com/logo.png"
+                    className="w-full px-4 py-3 border-2 border-gold-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold-500 focus:border-transparent"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Enter the direct URL to your logo image</p>
+                </div>
+
+                {/* Logo Dimensions */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Logo Height (pixels)
+                    </label>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="range"
+                        min="24"
+                        max="120"
+                        value={logoHeight}
+                        onChange={(e) => setLogoHeight(e.target.value)}
+                        className="flex-1"
+                      />
+                      <input
+                        type="number"
+                        min="24"
+                        max="120"
+                        value={logoHeight}
+                        onChange={(e) => setLogoHeight(e.target.value)}
+                        className="w-20 px-3 py-2 border-2 border-gold-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold-500 text-center font-semibold"
+                      />
+                      <span className="text-sm text-gray-600 font-medium">px</span>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">Recommended: 48-80px</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Logo Max Width (pixels)
+                    </label>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="range"
+                        min="100"
+                        max="400"
+                        value={logoMaxWidth}
+                        onChange={(e) => setLogoMaxWidth(e.target.value)}
+                        className="flex-1"
+                      />
+                      <input
+                        type="number"
+                        min="100"
+                        max="400"
+                        value={logoMaxWidth}
+                        onChange={(e) => setLogoMaxWidth(e.target.value)}
+                        className="w-20 px-3 py-2 border-2 border-gold-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold-500 text-center font-semibold"
+                      />
+                      <span className="text-sm text-gray-600 font-medium">px</span>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">Recommended: 150-250px</p>
+                  </div>
+                </div>
+
+                {/* Banner Size Guidelines */}
+                <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4 mb-6">
+                  <h4 className="text-sm font-bold text-blue-900 mb-3 flex items-center gap-2">
+                    <Monitor size={18} />
+                    Recommended Image Sizes
+                  </h4>
+                  <div className="space-y-2 text-sm text-blue-800">
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold">Logo:</span>
+                      <span className="font-mono bg-white px-3 py-1 rounded border border-blue-200">200x80px or SVG</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold">Hero Banner:</span>
+                      <span className="font-mono bg-white px-3 py-1 rounded border border-blue-200">1920x600px</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold">Product Images:</span>
+                      <span className="font-mono bg-white px-3 py-1 rounded border border-blue-200">800x800px</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Save Button */}
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => {
+                      localStorage.setItem('siteLogo', logoUrl);
+                      localStorage.setItem('logoHeight', logoHeight);
+                      localStorage.setItem('logoMaxWidth', logoMaxWidth);
+                      alert('Logo settings saved! Please refresh the page to see changes.');
+                      window.location.reload();
+                    }}
+                    className="flex-1 px-6 py-3 bg-gradient-to-r from-gold-500 to-gold-600 text-white rounded-lg hover:from-gold-600 hover:to-gold-700 transition font-bold shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                  >
+                    <Check size={20} />
+                    Save Logo Settings
+                  </button>
+                  <button
+                    onClick={() => {
+                      setLogoUrl('https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=200&h=80&fit=crop');
+                      setLogoHeight('48');
+                      setLogoMaxWidth('200');
+                    }}
+                    className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-semibold"
+                  >
+                    Reset to Default
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Products Tab */}
           {activeTab === 'products' && (
             <div className="p-6">

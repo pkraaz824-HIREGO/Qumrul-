@@ -37,8 +37,12 @@ export function Header({ onMenuClick, isMenuOpen }) {
               <img 
                 src={localStorage.getItem('siteLogo') || 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=200&h=80&fit=crop'}
                 alt="LAP Ultra"
-                className="h-12 object-contain group-hover:scale-105 transition-transform"
-                style={{ width: 'auto', maxWidth: '200px' }}
+                className="object-contain group-hover:scale-105 transition-transform"
+                style={{ 
+                  height: `${localStorage.getItem('logoHeight') || '48'}px`,
+                  maxWidth: `${localStorage.getItem('logoMaxWidth') || '200'}px`,
+                  width: 'auto' 
+                }}
               />
             </a>
           </div>
