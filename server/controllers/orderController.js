@@ -1,5 +1,7 @@
 import Order from '../models/Order.js';
 import Product from '../models/Product.js';
+import { generateInvoicePDFBuffer } from '../services/invoiceService.js';
+import { sendInvoiceEmail } from '../services/emailService.js';
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -51,6 +53,21 @@ export const createOrder = async (req, res) => {
         $inc: { stock: -item.quantity }
       });
     }
+
+    // Populate user for invoice generation
+    await order.populate('user', 'firstName lastName email phone');
+
+    // Generate and send invoice email (non-blocking)
+    setImmediate(async () => {
+      try {
+        const pdfBuffer = await generateInvoicePDFBuffer(order);
+        await sendInvoiceEmail(req.user.email, pdfBuffer, order._id);
+        console.log(`✅ Invoice email sent for order ${order._id}`);
+      } catch (emailError) {
+        console.error(`❌ Failed to send invoice email for order ${order._id}:`, emailError.message);
+        // Don't fail the order creation if email fails
+      }
+    });
 
     res.status(201).json(order);
   } catch (error) {
@@ -217,5 +234,39 @@ export const cancelOrder = async (req, res) => {
     res.status(400).json({ message: 'Cannot cancel this order' });
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Get order invoice (download PDF)
+// @route   GET /api/orders/:id/invoice
+// @access  Private
+export const getOrderInvoice = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id)
+      .populate('user', 'firstName lastName email phone');
+
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    // Check if user owns this order or is admin
+    if (order.user._id.toString() !== req.user._id.toString() && !req.user.isAdmin) {
+      return res.status(403).json({ message: 'Not authorized to download this invoice' });
+    }
+
+    // Generate PDF
+    const pdfBuffer = await generateInvoicePDFBuffer(order);
+
+    // Set response headers for PDF download
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="Invoice-${order._id}.pdf"`,
+      'Content-Length': pdfBuffer.length
+    });
+
+    res.send(pdfBuffer);
+  } catch (error) {
+    console.error('Invoice generation error:', error);
+    res.status(500).json({ message: 'Error generating invoice: ' + error.message });
   }
 };
