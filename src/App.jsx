@@ -18,7 +18,6 @@ import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage';
 import { TermsPage } from './pages/TermsPage';
 import { CareersPage } from './pages/CareersPage';
 import { ResetPasswordPage } from './pages/ResetPasswordPage';
-import { ProfilePage } from './pages/ProfilePage';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState('/');
@@ -85,8 +84,6 @@ export default function App() {
         return <LoginPage />;
       case '/reset-password':
         return <ResetPasswordPage />;
-      case '/profile':
-        return <ProfilePage />;
       case '/my-orders':
         return <MyOrdersPage />;
       case '/admin':
