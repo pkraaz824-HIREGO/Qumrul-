@@ -672,10 +672,16 @@ export function AdminPage() {
                       Upload Logo
                       <input
                         type="file"
-                        accept="image/*"
+                        accept="image/png"
                         onChange={(e) => {
                           const file = e.target.files[0];
                           if (file) {
+                            // Validate file type
+                            if (!file.type.includes('png')) {
+                              alert('Only PNG files are accepted for logo upload!');
+                              e.target.value = ''; // Reset input
+                              return;
+                            }
                             const reader = new FileReader();
                             reader.onloadend = () => {
                               setLogoUrl(reader.result);
@@ -687,7 +693,7 @@ export function AdminPage() {
                       />
                     </label>
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">Enter a URL or upload an image file</p>
+                  <p className="text-xs text-gray-500 mt-1">Enter a URL or upload a PNG image file (PNG format required)</p>
                 </div>
 
                 {/* Logo Dimensions */}
