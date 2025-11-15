@@ -28,6 +28,26 @@ export function ProductsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gold-50/30 py-6 md:py-8 lg:py-10">
+      <div className="flex">
+        {/* Left Sidebar Logo */}
+        <div className="hidden xl:block xl:w-56 flex-shrink-0">
+          <div className="sticky top-24 p-6">
+            <div className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl p-6 border border-gold-200">
+              <img
+                src={localStorage.getItem('siteLogo') || 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=200&h=80&fit=crop'}
+                alt="LAP Ultra"
+                className="w-full object-contain"
+                style={{ 
+                  height: `${localStorage.getItem('logoHeight') || '48'}px`,
+                  maxWidth: '100%'
+                }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="flex-1">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header - Premium typography */}
         <div className="mb-6 md:mb-8">
@@ -139,6 +159,8 @@ export function ProductsPage() {
               </div>
             )}
           </div>
+        </div>
+      </div>
         </div>
       </div>
     </div>

@@ -128,6 +128,26 @@ export function MyOrdersPage() {
 
   return (
     <div className="min-h-screen bg-gradient-gold py-8">
+      <div className="flex">
+        {/* Left Sidebar Logo */}
+        <div className="hidden lg:block lg:w-48 xl:w-64 flex-shrink-0">
+          <div className="sticky top-24 p-6">
+            <div className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl p-6 border border-gold-200">
+              <img
+                src={localStorage.getItem('siteLogo') || 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=200&h=80&fit=crop'}
+                alt="LAP Ultra"
+                className="w-full object-contain"
+                style={{ 
+                  height: `${localStorage.getItem('logoHeight') || '48'}px`,
+                  maxWidth: '100%'
+                }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="flex-1">
       <div className="max-w-6xl mx-auto px-4">
         <h1 className="text-4xl font-bold gradient-text mb-8">My Orders</h1>
 
@@ -472,6 +492,8 @@ export function MyOrdersPage() {
           </div>
         </div>
       )}
+        </div>
+      </div>
     </div>
   );
 }
