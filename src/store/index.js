@@ -95,6 +95,14 @@ export const useAuthStore = create((set) => ({
     set({ user: null, isLoggedIn: false });
     localStorage.removeItem('user');
   },
+  resetPassword: (email, newPassword) => {
+    const user = mockUsers.find(u => u.email === email);
+    if (user) {
+      user.password = newPassword;
+      return true;
+    }
+    return false;
+  },
   initializeAuth: () => {
     const savedUser = localStorage.getItem('user');
     if (savedUser) {

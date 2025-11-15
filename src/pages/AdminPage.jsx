@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useAuthStore, useProductStore, useUserStore, useOrderStore, useBannerStore } from '../store';
-import { X, Plus, Edit2, Trash2, DollarSign, Users, Package, TrendingUp, Upload, Image as ImageIcon, Tag, Check, XCircle, Truck, Eye, RefreshCw, ChevronUp, ChevronDown, Monitor } from 'lucide-react';
+import { X, Plus, Edit2, Trash2, DollarSign, Users, Package, TrendingUp, Upload, Image as ImageIcon, Tag, Check, XCircle, Truck, Eye, RefreshCw, ChevronUp, ChevronDown, Monitor, Calendar, Filter } from 'lucide-react';
 
 export function AdminPage() {
   const { user, isLoggedIn } = useAuthStore();
@@ -18,6 +18,15 @@ export function AdminPage() {
   const [orderFilter, setOrderFilter] = useState('all');
   const [showBannerForm, setShowBannerForm] = useState(false);
   const [editingBannerId, setEditingBannerId] = useState(null);
+  
+  // Analytics Modal States
+  const [showRevenueModal, setShowRevenueModal] = useState(false);
+  const [showOrdersModal, setShowOrdersModal] = useState(false);
+  const [revenueDateRange, setRevenueDateRange] = useState('all');
+  const [orderDateRange, setOrderDateRange] = useState('all');
+  const [customStartDate, setCustomStartDate] = useState('');
+  const [customEndDate, setCustomEndDate] = useState('');
+  
   const [bannerFormData, setBannerFormData] = useState({
     image: '',
     title: '',
@@ -59,6 +68,52 @@ export function AdminPage() {
   const totalOrders = orders.length;
   const totalUsers = users.length;
   const totalProducts = products.length;
+
+  // Date filtering helper function
+  const filterOrdersByDate = (orders, dateRange, customStart, customEnd) => {
+    const now = new Date();
+    
+    return orders.filter(order => {
+      const orderDate = new Date(order.createdAt);
+      
+      switch(dateRange) {
+        case 'today':
+          return orderDate.toDateString() === now.toDateString();
+        
+        case 'week':
+          const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          return orderDate >= weekAgo;
+        
+        case 'month':
+          const monthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+          return orderDate >= monthAgo;
+        
+        case 'custom':
+          if (!customStart || !customEnd) return true;
+          const start = new Date(customStart);
+          const end = new Date(customEnd);
+          end.setHours(23, 59, 59, 999); // Include full end date
+          return orderDate >= start && orderDate <= end;
+        
+        default: // 'all'
+          return true;
+      }
+    });
+  };
+
+  // Filtered revenue data
+  const filteredRevenueOrders = useMemo(() => {
+    return filterOrdersByDate(orders, revenueDateRange, customStartDate, customEndDate);
+  }, [orders, revenueDateRange, customStartDate, customEndDate]);
+
+  const filteredRevenue = filteredRevenueOrders.reduce((sum, order) => sum + order.total, 0);
+
+  // Filtered orders data
+  const filteredOrdersData = useMemo(() => {
+    return filterOrdersByDate(orders, orderDateRange, customStartDate, customEndDate);
+  }, [orders, orderDateRange, customStartDate, customEndDate]);
+
+  const filteredOrdersCount = filteredOrdersData.length;
 
   const handleFormChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -268,25 +323,39 @@ export function AdminPage() {
 
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-md p-6 border border-gold-100">
+          <button
+            onClick={() => setShowRevenueModal(true)}
+            className="bg-white rounded-lg shadow-md p-6 border border-gold-100 hover:border-gold-300 hover:shadow-xl transition-all cursor-pointer text-left group"
+          >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 uppercase">Total Revenue</p>
+                <p className="text-sm text-gray-600 uppercase flex items-center gap-2">
+                  Total Revenue
+                  <Filter size={14} className="text-gray-400 group-hover:text-gold-500 transition" />
+                </p>
                 <p className="text-2xl font-bold text-gold-600">₹{totalRevenue.toFixed(2)}</p>
+                <p className="text-xs text-gray-500 mt-1">Click to filter by date</p>
               </div>
-              <DollarSign className="text-gold-500" size={32} />
+              <DollarSign className="text-gold-500 group-hover:scale-110 transition" size={32} />
             </div>
-          </div>
+          </button>
 
-          <div className="bg-white rounded-lg shadow-md p-6 border border-gold-100">
+          <button
+            onClick={() => setShowOrdersModal(true)}
+            className="bg-white rounded-lg shadow-md p-6 border border-gold-100 hover:border-gold-300 hover:shadow-xl transition-all cursor-pointer text-left group"
+          >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 uppercase">Total Orders</p>
+                <p className="text-sm text-gray-600 uppercase flex items-center gap-2">
+                  Total Orders
+                  <Filter size={14} className="text-gray-400 group-hover:text-gold-500 transition" />
+                </p>
                 <p className="text-2xl font-bold text-gold-600">{totalOrders}</p>
+                <p className="text-xs text-gray-500 mt-1">Click to filter by date</p>
               </div>
-              <Package className="text-gold-500" size={32} />
+              <Package className="text-gold-500 group-hover:scale-110 transition" size={32} />
             </div>
-          </div>
+          </button>
 
           <div className="bg-white rounded-lg shadow-md p-6 border border-gold-100">
             <div className="flex items-center justify-between">
@@ -1285,6 +1354,311 @@ export function AdminPage() {
           )}
         </div>
       </div>
+
+      {/* Revenue Analytics Modal */}
+      {showRevenueModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeInUp">
+          <div className="bg-white rounded-2xl max-w-3xl w-full p-8 shadow-2xl animate-fadeInUp">
+            <div className="flex justify-between items-center mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-gold-500 to-gold-600 rounded-xl flex items-center justify-center">
+                  <DollarSign className="text-white" size={24} />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900">Revenue Analytics</h3>
+                  <p className="text-sm text-gray-600">Filter revenue by date range</p>
+                </div>
+              </div>
+              <button onClick={() => setShowRevenueModal(false)} className="text-gray-500 hover:text-gray-700">
+                <X size={28} />
+              </button>
+            </div>
+
+            {/* Date Range Filter */}
+            <div className="mb-6">
+              <label className="block text-sm font-semibold text-gray-700 mb-3">Select Date Range</label>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <button
+                  onClick={() => setRevenueDateRange('today')}
+                  className={`px-4 py-3 rounded-lg font-semibold transition ${
+                    revenueDateRange === 'today'
+                      ? 'bg-gold-500 text-white shadow-lg'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  Today
+                </button>
+                <button
+                  onClick={() => setRevenueDateRange('week')}
+                  className={`px-4 py-3 rounded-lg font-semibold transition ${
+                    revenueDateRange === 'week'
+                      ? 'bg-gold-500 text-white shadow-lg'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  This Week
+                </button>
+                <button
+                  onClick={() => setRevenueDateRange('month')}
+                  className={`px-4 py-3 rounded-lg font-semibold transition ${
+                    revenueDateRange === 'month'
+                      ? 'bg-gold-500 text-white shadow-lg'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  This Month
+                </button>
+                <button
+                  onClick={() => setRevenueDateRange('all')}
+                  className={`px-4 py-3 rounded-lg font-semibold transition ${
+                    revenueDateRange === 'all'
+                      ? 'bg-gold-500 text-white shadow-lg'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  All Time
+                </button>
+              </div>
+            </div>
+
+            {/* Custom Date Range */}
+            <div className="mb-6">
+              <button
+                onClick={() => setRevenueDateRange('custom')}
+                className={`w-full px-4 py-3 rounded-lg font-semibold transition mb-3 ${
+                  revenueDateRange === 'custom'
+                    ? 'bg-gold-500 text-white shadow-lg'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                <Calendar size={18} className="inline mr-2" />
+                Custom Date Range
+              </button>
+              {revenueDateRange === 'custom' && (
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1">Start Date</label>
+                    <input
+                      type="date"
+                      value={customStartDate}
+                      onChange={(e) => setCustomStartDate(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1">End Date</label>
+                    <input
+                      type="date"
+                      value={customEndDate}
+                      onChange={(e) => setCustomEndDate(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold-500"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Revenue Summary */}
+            <div className="bg-gradient-to-br from-gold-50 to-yellow-50 rounded-xl p-6 border-2 border-gold-200">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <p className="text-sm font-semibold text-gray-600 mb-1">Total Revenue</p>
+                  <p className="text-4xl font-bold gradient-text">₹{filteredRevenue.toFixed(2)}</p>
+                </div>
+                <TrendingUp className="text-gold-500" size={48} />
+              </div>
+              <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-gold-200">
+                <div>
+                  <p className="text-xs text-gray-600">Orders Count</p>
+                  <p className="text-xl font-bold text-gray-800">{filteredRevenueOrders.length}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-600">Average Order</p>
+                  <p className="text-xl font-bold text-gray-800">
+                    ₹{filteredRevenueOrders.length > 0 ? (filteredRevenue / filteredRevenueOrders.length).toFixed(2) : '0.00'}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Recent Orders in Range */}
+            {filteredRevenueOrders.length > 0 && (
+              <div className="mt-6">
+                <h4 className="font-bold text-gray-800 mb-3">Orders in Selected Range ({filteredRevenueOrders.length})</h4>
+                <div className="max-h-64 overflow-y-auto space-y-2">
+                  {filteredRevenueOrders.slice(0, 10).map((order) => (
+                    <div key={order.id} className="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-200">
+                      <div>
+                        <p className="font-semibold text-sm text-gray-800">{order.id}</p>
+                        <p className="text-xs text-gray-600">{order.createdAt}</p>
+                      </div>
+                      <p className="font-bold text-gold-600">₹{order.total.toFixed(2)}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Orders Analytics Modal */}
+      {showOrdersModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeInUp">
+          <div className="bg-white rounded-2xl max-w-3xl w-full p-8 shadow-2xl animate-fadeInUp">
+            <div className="flex justify-between items-center mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+                  <Package className="text-white" size={24} />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900">Orders Analytics</h3>
+                  <p className="text-sm text-gray-600">Filter orders by date range</p>
+                </div>
+              </div>
+              <button onClick={() => setShowOrdersModal(false)} className="text-gray-500 hover:text-gray-700">
+                <X size={28} />
+              </button>
+            </div>
+
+            {/* Date Range Filter */}
+            <div className="mb-6">
+              <label className="block text-sm font-semibold text-gray-700 mb-3">Select Date Range</label>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <button
+                  onClick={() => setOrderDateRange('today')}
+                  className={`px-4 py-3 rounded-lg font-semibold transition ${
+                    orderDateRange === 'today'
+                      ? 'bg-blue-500 text-white shadow-lg'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  Today
+                </button>
+                <button
+                  onClick={() => setOrderDateRange('week')}
+                  className={`px-4 py-3 rounded-lg font-semibold transition ${
+                    orderDateRange === 'week'
+                      ? 'bg-blue-500 text-white shadow-lg'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  This Week
+                </button>
+                <button
+                  onClick={() => setOrderDateRange('month')}
+                  className={`px-4 py-3 rounded-lg font-semibold transition ${
+                    orderDateRange === 'month'
+                      ? 'bg-blue-500 text-white shadow-lg'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  This Month
+                </button>
+                <button
+                  onClick={() => setOrderDateRange('all')}
+                  className={`px-4 py-3 rounded-lg font-semibold transition ${
+                    orderDateRange === 'all'
+                      ? 'bg-blue-500 text-white shadow-lg'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  All Time
+                </button>
+              </div>
+            </div>
+
+            {/* Custom Date Range */}
+            <div className="mb-6">
+              <button
+                onClick={() => setOrderDateRange('custom')}
+                className={`w-full px-4 py-3 rounded-lg font-semibold transition mb-3 ${
+                  orderDateRange === 'custom'
+                    ? 'bg-blue-500 text-white shadow-lg'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                <Calendar size={18} className="inline mr-2" />
+                Custom Date Range
+              </button>
+              {orderDateRange === 'custom' && (
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1">Start Date</label>
+                    <input
+                      type="date"
+                      value={customStartDate}
+                      onChange={(e) => setCustomStartDate(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1">End Date</label>
+                    <input
+                      type="date"
+                      value={customEndDate}
+                      onChange={(e) => setCustomEndDate(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Orders Summary */}
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border-2 border-blue-200">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <p className="text-sm font-semibold text-gray-600 mb-1">Total Orders</p>
+                  <p className="text-4xl font-bold text-blue-600">{filteredOrdersCount}</p>
+                </div>
+                <Package className="text-blue-500" size={48} />
+              </div>
+              <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-blue-200">
+                <div>
+                  <p className="text-xs text-gray-600">Pending</p>
+                  <p className="text-xl font-bold text-orange-600">
+                    {filteredOrdersData.filter(o => o.status === 'pending').length}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-600">Delivered</p>
+                  <p className="text-xl font-bold text-green-600">
+                    {filteredOrdersData.filter(o => o.status === 'delivered').length}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-600">Cancelled</p>
+                  <p className="text-xl font-bold text-red-600">
+                    {filteredOrdersData.filter(o => o.status === 'cancelled').length}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Recent Orders in Range */}
+            {filteredOrdersData.length > 0 && (
+              <div className="mt-6">
+                <h4 className="font-bold text-gray-800 mb-3">Orders in Selected Range ({filteredOrdersData.length})</h4>
+                <div className="max-h-64 overflow-y-auto space-y-2">
+                  {filteredOrdersData.slice(0, 10).map((order) => (
+                    <div key={order.id} className="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-200">
+                      <div>
+                        <p className="font-semibold text-sm text-gray-800">{order.id}</p>
+                        <p className="text-xs text-gray-600">{order.createdAt}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs font-semibold text-gray-600 capitalize">{order.status}</p>
+                        <p className="font-bold text-gray-800">₹{order.total.toFixed(2)}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useCartStore, useOrderStore, useAuthStore } from '../store';
 import { CartItem } from '../components/CartItem';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Package } from 'lucide-react';
+import { downloadInvoice, sendInvoiceEmail } from '../utils/invoiceGenerator';
 
 export function CartPage() {
   const { items, removeItem, updateQuantity, clearCart, getTotal } = useCartStore();
@@ -75,7 +76,7 @@ export function CartPage() {
     setStep('checkout');
   };
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     // Validate form
     if (!formData.firstName || !formData.email || !formData.address) {
       alert('Please fill in all required fields');
@@ -112,6 +113,13 @@ export function CartPage() {
     addOrder(newOrder);
     setOrder(newOrder);
     
+    // Automatically send invoice email
+    try {
+      await sendInvoiceEmail(newOrder, user);
+    } catch (error) {
+      console.error('Failed to send invoice email:', error);
+    }
+    
     // Clear cart only if not Buy Now
     if (!isBuyNow) {
       clearCart();
@@ -131,12 +139,23 @@ export function CartPage() {
               </svg>
             </div>
             <h1 className="text-3xl font-bold text-gray-800 mb-4">Order Confirmed!</h1>
-            <p className="text-gray-600 mb-6">Thank you for your purchase.</p>
+            <p className="text-gray-600 mb-2">Thank you for your purchase.</p>
+            <p className="text-sm text-green-600 font-semibold mb-6">📧 Invoice has been sent to your email</p>
 
             <div className="bg-gold-50 rounded-lg p-6 mb-8 text-left border border-gold-200">
               <p className="text-sm text-gray-600 mb-2"><strong>Order ID:</strong> {order.id}</p>
               <p className="text-sm text-gray-600 mb-2"><strong>Total:</strong> ₹{order.total.toFixed(2)}</p>
               <p className="text-sm text-gray-600"><strong>Status:</strong> <span className="text-yellow-600 font-semibold">Pending</span></p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
+              <button
+                onClick={() => downloadInvoice(order, user)}
+                className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition font-semibold flex items-center justify-center gap-2"
+              >
+                <Package size={20} />
+                Download Invoice
+              </button>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

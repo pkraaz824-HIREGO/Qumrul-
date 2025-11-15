@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuthStore, useOrderStore } from '../store';
-import { Package, Truck, CheckCircle, XCircle, Clock, MapPin, Phone, CreditCard, Calendar, AlertCircle } from 'lucide-react';
+import { Package, Truck, CheckCircle, XCircle, Clock, MapPin, Phone, CreditCard, Calendar, AlertCircle, Download, Mail } from 'lucide-react';
+import { downloadInvoice, sendInvoiceEmail } from '../utils/invoiceGenerator';
 
 export function MyOrdersPage() {
   const { user, isLoggedIn } = useAuthStore();
@@ -9,6 +10,23 @@ export function MyOrdersPage() {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
   const [orderToCancel, setOrderToCancel] = useState(null);
+  const [emailSending, setEmailSending] = useState(false);
+
+  const handleDownloadInvoice = (order) => {
+    downloadInvoice(order, user);
+  };
+
+  const handleEmailInvoice = async (order) => {
+    setEmailSending(true);
+    try {
+      const result = await sendInvoiceEmail(order, user);
+      alert(result.message + '\n(In production, this would send an actual email)');
+    } catch (error) {
+      alert('Failed to send invoice email');
+    } finally {
+      setEmailSending(false);
+    }
+  };
 
   const handleCancelClick = (order) => {
     setOrderToCancel(order);
@@ -160,6 +178,23 @@ export function MyOrdersPage() {
                     {selectedOrder?.id === order.id ? 'Hide Details' : 'Track Order'}
                   </button>
                   
+                  <button
+                    onClick={() => handleDownloadInvoice(order)}
+                    className="px-6 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 hover:shadow-xl transition font-semibold flex items-center gap-2"
+                  >
+                    <Download size={18} />
+                    Download Invoice
+                  </button>
+                  
+                  <button
+                    onClick={() => handleEmailInvoice(order)}
+                    disabled={emailSending}
+                    className="px-6 py-2 bg-green-500 text-white rounded-full hover:bg-green-600 hover:shadow-xl transition font-semibold flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Mail size={18} />
+                    {emailSending ? 'Sending...' : 'Email Invoice'}
+                  </button>
+                  
                   {canCancelOrder(order) && (
                     <button
                       onClick={() => handleCancelClick(order)}
@@ -187,49 +222,69 @@ export function MyOrdersPage() {
                       Order Tracking Timeline
                     </h4>
                     
-                    <div className="relative">
-                      {/* Timeline Line */}
-                      <div className="absolute left-4 top-8 bottom-8 w-0.5 bg-gold-200"></div>
-                      
-                      {/* Timeline Items */}
-                      <div className="space-y-6">
-                        {order.timeline && order.timeline.map((event, idx) => (
-                          <div key={idx} className="relative flex items-start gap-4">
-                            <div className={`relative z-10 flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-                              event.completed
-                                ? 'bg-gradient-to-br from-gold-500 to-gold-600 shadow-lg'
-                                : 'bg-gray-200 border-2 border-gray-300'
-                            }`}>
-                              {event.completed ? (
-                                <CheckCircle className="text-white" size={18} />
-                              ) : (
-                                <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
-                              )}
-                            </div>
-                            
-                            <div className="flex-1 bg-white rounded-lg p-4 shadow-sm">
-                              <div className="flex justify-between items-start">
-                                <div>
-                                  <p className={`font-bold ${
-                                    event.completed ? 'text-gray-900' : 'text-gray-500'
-                                  }`}>
-                                    {event.status}
-                                  </p>
-                                  {event.date && (
-                                    <p className="text-sm text-gray-600 mt-1">{event.date}</p>
-                                  )}
-                                </div>
-                                {event.completed && (
-                                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-semibold">
-                                    Completed
-                                  </span>
+                    {order.timeline && order.timeline.length > 0 ? (
+                      <div className="relative">
+                        {/* Timeline Line */}
+                        <div className="absolute left-4 top-8 bottom-8 w-0.5 bg-gold-200"></div>
+                        
+                        {/* Timeline Items */}
+                        <div className="space-y-6">
+                          {order.timeline.map((event, idx) => (
+                            <div key={idx} className="relative flex items-start gap-4">
+                              <div className={`relative z-10 flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+                                event.completed
+                                  ? 'bg-gradient-to-br from-gold-500 to-gold-600 shadow-lg'
+                                  : 'bg-gray-200 border-2 border-gray-300'
+                              }`}>
+                                {event.completed ? (
+                                  <CheckCircle className="text-white" size={18} />
+                                ) : (
+                                  <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
                                 )}
                               </div>
+                              
+                              <div className="flex-1 bg-white rounded-lg p-4 shadow-sm">
+                                <div className="flex justify-between items-start">
+                                  <div>
+                                    <p className={`font-bold ${
+                                      event.completed ? 'text-gray-900' : 'text-gray-500'
+                                    }`}>
+                                      {event.status}
+                                    </p>
+                                    {event.date && (
+                                      <p className="text-sm text-gray-600 mt-1">{event.date}</p>
+                                    )}
+                                  </div>
+                                  {event.completed && (
+                                    <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-semibold">
+                                      Completed
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          ))}
+                        </div>
                       </div>
-                    </div>
+                    ) : (
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
+                        <Clock className="text-blue-600 mx-auto mb-3" size={32} />
+                        <p className="text-blue-900 font-semibold mb-1">Order Tracking</p>
+                        <p className="text-blue-700 text-sm">Your order is being processed. Tracking information will be updated soon.</p>
+                        <div className="mt-4 space-y-2">
+                          <div className="flex items-center justify-between bg-white rounded-lg p-3">
+                            <span className="text-sm text-gray-700">Order Status:</span>
+                            <span className={`text-sm font-bold px-3 py-1 rounded-full ${getStatusColor(order.status)} capitalize`}>
+                              {order.status}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between bg-white rounded-lg p-3">
+                            <span className="text-sm text-gray-700">Estimated Delivery:</span>
+                            <span className="text-sm font-semibold text-gray-900">{order.estimatedDelivery || 'TBD'}</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Order Items Detail */}
                     <div className="mt-8">
@@ -282,7 +337,7 @@ export function MyOrdersPage() {
                         </div>
                         <div className="flex justify-between text-xl font-bold text-gray-900 pt-4 border-t-2 border-gold-300 mt-2">
                           <span>Total</span>
-                          <span className="gradient-text">${order.total.toFixed(2)}</span>
+                          <span className="gradient-text">₹{order.total.toFixed(2)}</span>
                         </div>
                       </div>
                     </div>
@@ -345,12 +400,12 @@ export function MyOrdersPage() {
             <div className="bg-gray-50 rounded-lg p-4 mb-6">
               <div className="flex justify-between mb-2">
                 <span className="text-gray-700">Order Total:</span>
-                <span className="font-bold text-gray-900">${orderToCancel.total.toFixed(2)}</span>
+                <span className="font-bold text-gray-900">₹{orderToCancel.total.toFixed(2)}</span>
               </div>
               {orderToCancel.paymentType === 'prepaid' && (
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Refund Amount:</span>
-                  <span className="font-semibold text-green-600">${orderToCancel.total.toFixed(2)}</span>
+                  <span className="font-semibold text-green-600">₹{orderToCancel.total.toFixed(2)}</span>
                 </div>
               )}
             </div>
